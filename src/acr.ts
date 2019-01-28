@@ -1,9 +1,12 @@
-import * as brigadier from "@azure/brigadier";
+import { Job } from "@azure/brigadier";
 
-export class ACRBuildJob extends brigadier.Job {
+/**
+ * ACRBuildJob represents a Brigade Job that builds a container image using ACR
+ */
+export class ACRBuildJob extends Job {
 
     /**
-    * The constructor returns a new Brigade Job configured to
+    * The constructor returns a new Brigade Job configured to build a container image using ACR
     *
     * @param name - name of the job
     * @param img - container image to be built
