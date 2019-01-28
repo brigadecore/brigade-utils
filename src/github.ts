@@ -4,7 +4,6 @@ import { Result } from "@azure/brigadier/out/job";
 
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
- *
  */
 export class Notification {
     project: Project;
@@ -19,7 +18,6 @@ export class Notification {
     conclusion: Conclusion;
 
     /**
-     *
      * @param name - name of the Job that will be created
      * @param event - Brigade event
      * @param project - Brigade project
@@ -43,7 +41,7 @@ export class Notification {
 
     // Send a new notification, and return a Promise<result>.
     run(): Promise<Result> {
-        this.count++
+        this.count++;
         var j = new Job(`${this.name}-${this.count}`, "deis/brigade-github-check-run:latest");
         j.imageForcePull = true;
         j.env = {
@@ -59,7 +57,6 @@ export class Notification {
         return j.run();
     }
 }
-
 
 /**
 * Helper to wrap a job execution between two notifications.
@@ -80,7 +77,7 @@ export async function WrapNotification(job: Job, notification: Notification, con
     }
     await notification.run();
     try {
-        let res = await job.run()
+        let res = await job.run();
         const logs = await job.logs();
 
         notification.conclusion = conclusion;

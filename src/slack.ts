@@ -3,7 +3,6 @@ import { Job } from "@azure/brigadier";
 export class SlackJob extends Job {
 
     /**
-     *
      * @param name - name of the job that will be created
      * @param title - title of the message to be posted in Slack
      * @param message - message body to be posted in Slack
