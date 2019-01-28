@@ -1,0 +1,44 @@
+{
+  "name": "brigade-utils",
+  "version": "0.0.1",
+  "description": "Various utility classes and functions to use in brigade.js",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "mocha --compilers ts:ts-node/register --recursive ./test/**/*.ts"
+  },
+  "files": [
+    "out/*.js",
+    "out/*.ts"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.0.1",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^10.3.0",
+    "chai": "^4.1.0",
+    "mocha": "^3.4.2",
+    "prettier": "^1.9.1",
+    "rimraf": "^2.6.2",
+    "ts-node": "^7.0.0",
+    "typedoc": "^0.11.0",
+    "typescript": "^3.0.1"
+  },
+  "dependencies": {
+    "@azure/brigadier": "^0.2.1",
+    "@kubernetes/client-node": "^0.7.2",
+    "child-process-promise": "^2.2.1",
+    "pretty-error": "^2.1.1",
+    "ulid": "^0.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radu-matei/brigade-utils.git"
+  },
+  "author": "Radu M <root@radu-matei.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/radu-matei/brigade-utils/issues"
+  },
+  "homepage": "https://github.com/radu-matei/brigade-utils#readme"
+}
