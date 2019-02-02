@@ -27,18 +27,11 @@
   "dependencies": {
     "@azure/brigadier": "^0.2.1",
     "@kubernetes/client-node": "^0.7.2",
+    "@types/request": "^2.48.1",
     "child-process-promise": "^2.2.1",
     "pretty-error": "^2.1.1",
     "ulid": "^0.2.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/radu-matei/brigade-utils.git"
-  },
-  "author": "Radu M <root@radu-matei.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/radu-matei/brigade-utils/issues"
-  },
-  "homepage": "https://github.com/radu-matei/brigade-utils#readme"
+  "author": "The Brigade Authors",
+  "license": "MIT"
 }

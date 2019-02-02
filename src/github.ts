@@ -78,7 +78,7 @@ export async function WrapNotification(job: Job, notification: Notification, con
     await notification.run();
     try {
         let res = await job.run();
-        const logs = await job.logs();
+        // const logs = await job.logs();
 
         notification.conclusion = conclusion;
         notification.summary = `Task "${job.name}" passed`;
