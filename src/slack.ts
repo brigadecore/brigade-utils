@@ -1,4 +1,4 @@
-import { Job } from "@azure/brigadier";
+import { Job } from "@brigadecore/brigadier";
 
 export class SlackJob extends Job {
 

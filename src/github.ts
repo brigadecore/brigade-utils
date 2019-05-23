@@ -1,6 +1,6 @@
-import { BrigadeEvent, Project } from "@azure/brigadier/out/events";
-import { Job } from "@azure/brigadier";
-import { Result } from "@azure/brigadier/out/job";
+import { BrigadeEvent, Project } from "@brigadecore/brigadier/out/events";
+import { Job } from "@brigadecore/brigadier";
+import { Result } from "@brigadecore/brigadier/out/job";
 
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
