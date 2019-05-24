@@ -1,4 +1,4 @@
-import { Job } from "@azure/brigadier";
+import { Job } from "@brigadecore/brigadier";
 
 /**
  * ACRBuildJob represents a Brigade Job that builds a container image using ACR
