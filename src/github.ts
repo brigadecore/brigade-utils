@@ -1,6 +1,34 @@
 import { BrigadeEvent, Project } from "@brigadecore/brigadier/out/events";
-import { Job } from "@brigadecore/brigadier";
 import { Result } from "@brigadecore/brigadier/out/job";
+import { Job } from "@brigadecore/brigadier";
+
+export class Check {
+    event: BrigadeEvent;
+    project: Project;
+    job: Job;
+    notification: Notification;
+
+    constructor(event: BrigadeEvent, project: Project, job: Job, detailsURL?: string, notification?: Notification) {
+        this.event = event;
+        this.project = project;
+        this.job = job;
+        if (notification != null) {
+            this.notification = notification;
+        } else {
+            this.notification = new Notification(this.job.name, event, project, detailsURL);
+        }
+    }
+
+    run() {
+        this.notification.conclusion = Conclusion.Neutral;
+        this.notification.title = `Run ${this.job.name}`;
+        if (this.event.revision != null) {
+            this.notification.summary = `Running ${this.job.name} target for ${this.event.revision.commit}`;
+        }
+
+        return this.notification.wrap(this.job)
+    }
+}
 
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
@@ -10,28 +38,35 @@ export class Notification {
     payload: any;
     name: string;
     externalID: any;
-    detailsUrl: string;
+    detailsUrl: string = "";
     title: string;
     text: string;
     summary: string;
     count: number;
     conclusion: Conclusion;
+    notificationJobImage: string = "deis/brigade-github-check-run:latest";
 
     /**
      * @param name - name of the Job that will be created
      * @param event - Brigade event
      * @param project - Brigade project
      * @param detailsUrl - URL where build details can be found (visible in the GitHub UI)
+     * @param notificationJobImage - optional container image that executes the notification
      */
-    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl: string) {
+    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl?: string, notificationJobImage?: string) {
         this.project = project;
         this.payload = event.payload;
         this.name = name;
         this.externalID = event.buildID;
-        this.detailsUrl = detailsUrl;
         this.title = "running check";
         this.text = "";
         this.summary = "";
+        if (notificationJobImage != null) {
+            this.notificationJobImage = notificationJobImage;
+        }
+        if (detailsUrl != null) {
+            this.detailsUrl = detailsUrl;
+        }
 
         // count allows us to send the notification multiple times, with a distinct pod name
         // each time.
@@ -40,9 +75,9 @@ export class Notification {
     }
 
     // Send a new notification, and return a Promise<result>.
-    run(): Promise<Result> {
+    send(): Promise<Result> {
         this.count++;
-        var j = new Job(`${this.name}-${this.count}`, "deis/brigade-github-check-run:latest");
+        var j = new Job(`${this.name}-${this.count}`, this.notificationJobImage);
         j.imageForcePull = true;
         j.env = {
             CHECK_CONCLUSION: this.conclusion,
@@ -56,45 +91,34 @@ export class Notification {
         }
         return j.run();
     }
-}
 
-/**
-* Helper to wrap a job execution between two notifications.
-*
-* @param job - Brigade job to run
-* @param notification - Notification object to use
-* @param conclusion -
-* @param dir - directory where the container build context cab be found. It requires the Dockerfile to be at the root
-* @param registry - container registry to log in to, and where the image will be pushed
-* @param username - username for the container registry
-* @param token - Azure Service Principal token to log in for the registry. The Service Principal needs to have proper permissions
-* @param tenant - the Azure tenant of the subscription
-* @param azureCli - the Docker image to use for the Azure CLI. Defaults to "microsoft/azure-cli:latest"
-*/
-export async function WrapNotification(job: Job, notification: Notification, conclusion: Conclusion) {
-    if (conclusion == null) {
-        conclusion = Conclusion.Success;
-    }
-    await notification.run();
-    try {
-        let res = await job.run();
-        // const logs = await job.logs();
-
-        notification.conclusion = conclusion;
-        notification.summary = `Task "${job.name}" passed`;
-        notification.text = notification.text = "```" + res.toString() + "```\nTest Complete";
-        return await notification.run();
-    } catch (e) {
-        const logs = await job.logs();
-        notification.conclusion = Conclusion.Failure;
-        notification.summary = `Task "${job.name}" failed for ${e.buildID}`;
-        notification.text = "```" + logs + "```\nFailed with error: " + e.toString();
+    /**
+    * Helper to wrap a job execution between two notifications.
+    *
+    * @param job - Brigade job to run
+    * @param notification - notification object to use
+    * @param conclusion - conclusion of the run
+    */
+    async wrap(job: Job) {
+        await this.send();
         try {
-            return await notification.run();
-        } catch (e2) {
-            console.error("failed to send notification: " + e2.toString());
-            console.error("original error: " + e.toString());
-            return e2;
+            let res = await job.run();
+            this.conclusion = Conclusion.Success;
+            this.summary = `Task "${job.name}" passed`;
+            this.text = "```" + res.toString() + "```\nTest Complete";
+            return await this.send();
+        } catch (e) {
+            const logs = await job.logs();
+            this.conclusion = Conclusion.Failure;
+            this.summary = `Task "${job.name}" failed for ${e.buildID}`;
+            this.text = "```" + logs + "```\nFailed with error: " + e.toString();
+            try {
+                return await this.send();
+            } catch (e2) {
+                console.error("failed to send notification: " + e2.toString());
+                console.error("original error: " + e.toString());
+                return e2;
+            }
         }
     }
 }
