@@ -18,10 +18,10 @@ function build(e, project) {
   return build;
 }
 
-events.on("check_suite:requested", runSuite);
-events.on("check_suite:rerequested", runSuite);
-
 function runSuite(e, p) {
   var check = new Check(e, p, build());
   check.run();
 }
+
+events.on("check_suite:requested", runSuite);
+events.on("check_suite:rerequested", runSuite);

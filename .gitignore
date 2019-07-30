@@ -1,2 +1,4 @@
 node_modules/
+
+# The out/ directory is checked in because for every pull request, we functionally test GitHub library
 # out/

@@ -9,6 +9,7 @@ export declare class Check {
     constructor(event: BrigadeEvent, project: Project, job: Job, detailsURL?: string, notification?: Notification);
     run(): Promise<any>;
 }
+export declare const notificationJobImage: string;
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
  */
@@ -31,7 +32,7 @@ export declare class Notification {
      * @param detailsUrl - URL where build details can be found (visible in the GitHub UI)
      * @param notificationJobImage - optional container image that executes the notification
      */
-    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl?: string, notificationJobImage?: string);
+    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl?: string, image?: string);
     send(): Promise<Result>;
     /**
     * Helper to wrap a job execution between two notifications.

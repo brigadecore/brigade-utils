@@ -1,6 +1,6 @@
 {
-  "name": "brigade-utils",
-  "version": "0.0.1",
+  "name": "@brigadecore/brigade-utils",
+  "version": "0.1.0",
   "description": "Various utility classes and functions to use in brigade.js",
   "main": "index.js",
   "scripts": {

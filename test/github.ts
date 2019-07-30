@@ -1,7 +1,7 @@
 import "mocha";
 import { assert } from "chai";
 import * as mock from "./mock";
-import { Notification, Check } from "../src/github";
+import { Notification, Check, notificationJobImage } from "../src/github";
 
 describe("when creating a new GitHub notification", () => {
     it("all properties are properly instantiated", () => {
@@ -15,7 +15,7 @@ describe("when creating a new GitHub notification", () => {
         assert.equal(notification.externalID, event.buildID);
         assert.equal(notification.detailsUrl, "mock url");
         assert.equal(notification.title, "running check");
-        assert.equal(notification.notificationJobImage, "deis/brigade-github-check-run:latest");
+        assert.equal(notification.notificationJobImage, notificationJobImage);
 
         let notification2 = new Notification("mock notification", event, project, "mock url", "custom-image:tag");
         assert.equal(notification2.notificationJobImage, "custom-image:tag");

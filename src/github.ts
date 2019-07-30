@@ -30,6 +30,9 @@ export class Check {
     }
 }
 
+// Whenever https://github.com/brigadecore/brigade-github-app releases a new version for the check run image, this should be updated
+export const notificationJobImage: string = "brigadecore/brigade-github-check-run:v0.1.0";
+
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
  */
@@ -44,7 +47,7 @@ export class Notification {
     summary: string;
     count: number;
     conclusion: Conclusion;
-    notificationJobImage: string = "deis/brigade-github-check-run:latest";
+    notificationJobImage: string = notificationJobImage;
 
     /**
      * @param name - name of the Job that will be created
@@ -53,7 +56,7 @@ export class Notification {
      * @param detailsUrl - URL where build details can be found (visible in the GitHub UI)
      * @param notificationJobImage - optional container image that executes the notification
      */
-    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl?: string, notificationJobImage?: string) {
+    constructor(name: string, event: BrigadeEvent, project: Project, detailsUrl?: string, image?: string) {
         this.project = project;
         this.payload = event.payload;
         this.name = name;
@@ -61,8 +64,8 @@ export class Notification {
         this.title = "running check";
         this.text = "";
         this.summary = "";
-        if (notificationJobImage != null) {
-            this.notificationJobImage = notificationJobImage;
+        if (image != null) {
+            this.notificationJobImage = image;
         }
         if (detailsUrl != null) {
             this.detailsUrl = detailsUrl;
