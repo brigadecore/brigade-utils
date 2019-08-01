@@ -7,7 +7,7 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 ```json
 {
     "dependencies": {
-        "@brigadecore/brigade-utils": "0.1.0"
+        "@brigadecore/brigade-utils": "0.2.0"
     }
 }
 ```
@@ -49,9 +49,14 @@ function runSuite(e, p) {
 
 events.on("check_suite:requested", runSuite);
 events.on("check_suite:rerequested", runSuite);
+
+// this enables "/brig run" comments from allowed authors to start a check run
+events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
 ```
 
-This script is one that can be used to build this repository
+This script is one that can be used to build this repository.
+
+> Note: `Check.handleIssueComment` currently only handles `/brig run` comments - to add your own, see implementation for this method.
 
 # Contributing
 

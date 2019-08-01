@@ -22,12 +22,28 @@ class Check {
         }
     }
     run() {
-        this.notification.conclusion = Conclusion.Neutral;
         this.notification.title = `Run ${this.job.name}`;
         if (this.event.revision != null) {
             this.notification.summary = `Running ${this.job.name} target for ${this.event.revision.commit}`;
         }
         return this.notification.wrap(this.job);
+    }
+    // handleIssueComment handles an issue_comment event, parsing the comment text.
+    // If the comment text is "/brig run", the passed handler is executed
+    static handleIssueComment(e, p, handle) {
+        console.log("handling issue comment....");
+        const payload = JSON.parse(e.payload);
+        // Extract the comment body and trim whitespace
+        const comment = payload.body.comment.body.trim();
+        // Here we determine if a comment should provoke an action
+        switch (comment) {
+            // Currently, the do-all '/brig run' comment is supported,
+            // for (re-)triggering the default Checks suite
+            case "/brig run":
+                return handle(e, p);
+            default:
+                console.log(`No applicable action found for comment: ${comment}`);
+        }
     }
 }
 exports.Check = Check;
@@ -63,7 +79,7 @@ class Notification {
         // count allows us to send the notification multiple times, with a distinct pod name
         // each time.
         this.count = 0;
-        this.conclusion = Conclusion.Neutral;
+        this.conclusion = Conclusion.InProgress;
     }
     // Send a new notification, and return a Promise<result>.
     send() {
@@ -127,5 +143,7 @@ var Conclusion;
     Conclusion["Neutral"] = "neutral";
     Conclusion["Cancelled"] = "cancelled";
     Conclusion["TimedOut"] = "timed_out";
+    // this sets the status of the check run to "in_progress"
+    Conclusion["InProgress"] = "";
 })(Conclusion = exports.Conclusion || (exports.Conclusion = {}));
 //# sourceMappingURL=github.js.map

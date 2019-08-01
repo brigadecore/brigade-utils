@@ -1,4 +1,4 @@
-import { BrigadeEvent, Project } from "@brigadecore/brigadier/out/events";
+import { BrigadeEvent, EventHandler, Project } from "@brigadecore/brigadier/out/events";
 import { Result } from "@brigadecore/brigadier/out/job";
 import { Job } from "@brigadecore/brigadier";
 export declare class Check {
@@ -8,6 +8,7 @@ export declare class Check {
     notification: Notification;
     constructor(event: BrigadeEvent, project: Project, job: Job, detailsURL?: string, notification?: Notification);
     run(): Promise<any>;
+    static handleIssueComment(e: BrigadeEvent, p: Project, handle: EventHandler): void;
 }
 export declare const notificationJobImage: string;
 /**
@@ -51,5 +52,6 @@ export declare enum Conclusion {
     Failure = "failure",
     Neutral = "neutral",
     Cancelled = "cancelled",
-    TimedOut = "timed_out"
+    TimedOut = "timed_out",
+    InProgress = ""
 }
