@@ -23,7 +23,7 @@ Brigade comes with a [GitHub application][gh-app] that can be used to queue buil
 
 ```javascript
 const { events, Job } = require("@brigadecore/brigadier");
-const { Check } = require("./out/github");
+const { Check } = require("@brigadecore/brigade-utils");
 
 const projectName = "brigade-utils";
 const jsImg = "node:12.3.1-stretch";
