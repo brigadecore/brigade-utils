@@ -4,7 +4,7 @@ const { Check } = require("./out/github");
 const projectName = "brigade-utils";
 const jsImg = "node:12.3.1-stretch";
 
-function build(e, project) {
+function build() {
   var build = new Job(`${projectName}-build`, jsImg);
 
   build.tasks = [
@@ -25,3 +25,6 @@ function runSuite(e, p) {
 
 events.on("check_suite:requested", runSuite);
 events.on("check_suite:rerequested", runSuite);
+
+events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
+events.on("issue_comment:edited", (e, p) => Check.handleIssueComment(e, p, runSuite));
