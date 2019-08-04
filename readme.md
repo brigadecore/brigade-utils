@@ -19,7 +19,7 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 
 ## The GitHub library
 
-Brigade comes with a [GitHub application][gh-app] that can be used to queue builds and show logs directly through the [GitHub Checks API][checks-api]. After following the instructions to set it up, adding a `brigade.js` script that uses the this API can be done using the `Check` object from this library:
+Brigade comes with a [GitHub application][gh-app] that can be used to queue builds and show logs directly through the [GitHub Checks API][checks-api]. After following the instructions to set it up, adding a `brigade.js` script that uses this API can be done using the `Check` object from this library:
 
 ```javascript
 const { events, Job } = require("@brigadecore/brigadier");
@@ -76,7 +76,7 @@ $ yarn test
 $ yarn audit
 ```
 
-Note that this repository *does not* ignore the generated `out/` directory that contains the compiled JavaScript code. This is done because for every pull request in this repository, we automatically [add the it as a local dependency to the Brigade worker (that is a dependency that is local to the repository)][local-deps], and use the GitHub library to test itself.
+Note that this repository *does not* ignore the generated `out/` directory that contains the compiled JavaScript code. This is done because for every pull request in this repository, we automatically [add it as a local dependency to the Brigade worker (that is a dependency that is local to the repository)][local-deps], and use the GitHub library to test itself.
 
 While this is not common or idiomatic for TypeScript projects, it is the easiest way to test the libraries in this repo for each pull request, so please include the `out/` directory when submitting a pull request.
 
