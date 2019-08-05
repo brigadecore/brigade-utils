@@ -22,7 +22,7 @@ describe("when creating a new GitHub notification", () => {
     });
 });
 
-describe("when creating a new check", () => {
+describe("when creating a new GitHub check", () => {
     it("all properties are properly instantiated", () => {
         let project = mock.mockProject();
         let event = mock.mockEvent();
