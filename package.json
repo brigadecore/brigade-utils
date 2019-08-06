@@ -27,5 +27,5 @@
     "@brigadecore/brigadier": "^0.4.0"
   },
   "author": "The Brigade Authors",
-  "license": "MIT"
+  "license": "Apache-2.0"
 }
