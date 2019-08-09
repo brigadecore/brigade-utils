@@ -14,7 +14,7 @@ class KindJob extends brigadier_1.Job {
         // set the timeout to 30 minutes
         this.timeout = 180000;
         // kind needs to add the following volumeMounts to function properly
-        // the Brigade project must enable `allowMountHosts`
+        // the Brigade project must enable `allowHostMounts`
         this.volumes = [
             {
                 name: "modules",
@@ -60,7 +60,7 @@ class KindJob extends brigadier_1.Job {
             "sleep 20",
             "kind create cluster --wait 300s",
             `export KUBECONFIG="$(kind get kubeconfig-path)"`,
-            // this pod is runing inside a Kubernetes cluster
+            // this pod is running inside a Kubernetes cluster
             // unset environment variables pointing to the host cluster
             // even if the service account is limited, and KUBECONFIG is properly set,
             // some operations might still point to the in-cluster configuration

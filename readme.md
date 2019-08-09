@@ -7,7 +7,7 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 ```json
 {
     "dependencies": {
-        "@brigadecore/brigade-utils": "0.2.0"
+        "@brigadecore/brigade-utils": "0.3.0"
     }
 }
 ```
@@ -28,7 +28,7 @@ const { Check } = require("@brigadecore/brigade-utils");
 const projectName = "brigade-utils";
 const jsImg = "node:12.3.1-stretch";
 
-function build(e, project) {
+function build(event, project) {
   var build = new Job(`${projectName}-build`, jsImg);
 
   build.tasks = [
@@ -57,6 +57,47 @@ events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runS
 This script is one that can be used to build this repository.
 
 > Note: `Check.handleIssueComment` currently only handles `/brig run` comments - to add your own, see implementation for this method.
+
+## The Kind library
+
+[Kind][kind] (Kubernetes in Doker) is a tool for creating a local Kubernetes cluster using Docker containers as nodes, nd it is a very fast and covenient way of setting up a Kubernetes cluster for testing.
+
+But while [setting it up locally is straightforward][kind-getting-started], running a Kind cluster inside your Kubernetes cluster (for various end-to-end testing scenarios) is rather difficult. This library abstracts all that, and creating and using a cluster can be easily achieved with Brigade:
+
+```js
+const { KindJob } = require("@brigadecore/brigade-utils");
+
+function e2e(event, project) {
+    let kind = new KindJob("kind");
+    kind.tasks.push(
+        // add your end-to-end tests
+        "kubectl get pods --all-namespaces"
+    );
+
+    return kind;
+}
+
+events.on("exec", e2e);
+```
+
+The `KindJob` class already configures the environment for a 1-node Kind cluster through Brigade:
+
+- marks the job as privileged
+- mounts all necessary volumes for Kind to work properly (see [this Kind issue](https://github.com/kubernetes-sigs/kind/issues/303#issuecomment-518593664))
+- starts Docker in Docker
+- creates a 1-node Kind cluster
+- exports the `KUBECONFIG` environment variable to point to the newly created cluster
+- unsets the Kubernetes environment variables that point to the host cluster 
+- ensures the cluster deletion command is always executed as cleanup
+
+Notes:
+
+- in order to start properly, ensure the Brigade project allows privileged jobs and allows host mounts (see [this issue](https://github.com/kubernetes-sigs/kind/issues/303#issuecomment-518593664))
+- this is an experimental configuration, which mounts host directories inside a privileged pod - before deploying this at scale on a production cluster, monitor your environment for any resource leaks. We do ensure to delete clusters create with the default configuration (using Linux traps), but overriding that can lead to damage to your cluster (see [this issue](https://github.com/kubernetes-sigs/kind/issues/759))
+- this job runs as a privileged pod in your cluster
+- the default image used contains `docker`, `go`, `kind`, `git`, `wget`, `apk` - you can supply your own, or you can use `apk`, or download other tools you might need .
+- if overriding the default configuration, ensure you are cleaning up clusters created to avoid resource leaks. See [how tasks are configured](./src/kind.ts).
+
 
 # Contributing
 
@@ -92,3 +133,5 @@ for how this is done.
 [npm]: https://www.npmjs.com/package/@brigadecore/brigade-utils
 [checks-api]: https://developer.github.com/v3/checks/
 [gh-app]: https://github.com/brigadecore/brigade-github-app
+[kind]: https://github.com/kubernetes-sigs/kind
+[kind-getting-started]: https://kind.sigs.k8s.io/docs/user/quick-start/
