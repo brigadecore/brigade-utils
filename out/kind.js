@@ -10,7 +10,7 @@ class KindJob extends brigadier_1.Job {
         super(name, image);
         // kind needs to run as a privileged pod
         this.privileged = true;
-        // since the cluste creation takes some time,
+        // since the cluster creation takes some time,
         // set the timeout to 30 minutes
         this.timeout = 180000;
         // kind needs to add the following volumeMounts to function properly
@@ -55,7 +55,7 @@ class KindJob extends brigadier_1.Job {
             // when the pod finishes, regardless of the exit code, delete the cluster
             // to avoid resource leaks
             // see https://github.com/kubernetes-sigs/kind/issues/759
-            "trap 'kind delete cluster' SIGTERM EXIT",
+            "trap 'kind delete cluster' EXIT",
             "dockerd-entrypoint.sh &",
             "sleep 20",
             "kind create cluster --wait 300s",

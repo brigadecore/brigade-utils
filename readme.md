@@ -60,7 +60,7 @@ This script is one that can be used to build this repository.
 
 ## The Kind library
 
-[Kind][kind] (Kubernetes in Doker) is a tool for creating a local Kubernetes cluster using Docker containers as nodes, nd it is a very fast and covenient way of setting up a Kubernetes cluster for testing.
+[Kind][kind] (Kubernetes in Docker) is a tool for creating a local Kubernetes cluster using Docker containers as nodes, nd it is a very fast and convenient way of setting up a Kubernetes cluster for testing.
 
 But while [setting it up locally is straightforward][kind-getting-started], running a Kind cluster inside your Kubernetes cluster (for various end-to-end testing scenarios) is rather difficult. This library abstracts all that, and creating and using a cluster can be easily achieved with Brigade:
 
@@ -93,11 +93,11 @@ The `KindJob` class already configures the environment for a 1-node Kind cluster
 Notes:
 
 - in order to start properly, ensure the Brigade project allows privileged jobs and allows host mounts (see [this issue](https://github.com/kubernetes-sigs/kind/issues/303#issuecomment-518593664))
-- this is an experimental configuration, which mounts host directories inside a privileged pod - before deploying this at scale on a production cluster, monitor your environment for any resource leaks. We do ensure to delete clusters create with the default configuration (using Linux traps), but overriding that can lead to damage to your cluster (see [this issue](https://github.com/kubernetes-sigs/kind/issues/759))
+- this is an experimental configuration, which mounts host directories inside a privileged pod - before deploying this at scale on a production cluster, monitor your environment for any resource leaks. We do ensure to delete clusters created with the default configuration (using Linux traps), but overriding that can lead to damage to your cluster (see [this issue](https://github.com/kubernetes-sigs/kind/issues/759)).
 - this job runs as a privileged pod in your cluster
-- the default image used contains `docker`, `go`, `kind`, `git`, `wget`, `apk` - you can supply your own, or you can use `apk`, or download other tools you might need .
+- the default image used contains `docker`, `go`, `kind`, `git`, `wget`, `apk` - you can supply your own, or you can use `apk`, or download other tools you might need.
 - if overriding the default configuration, ensure you are cleaning up clusters created to avoid resource leaks. See [how tasks are configured](./src/kind.ts).
-
+- the default timeout for Brigade jobs is 15 minutes - by default, the `KindJob` sets the timeout to 30 minutes, and you can configure it by setting the `job.timeout` property - and keep in mind the value is in milliseconds.
 
 # Contributing
 

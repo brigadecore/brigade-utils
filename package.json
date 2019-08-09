@@ -24,7 +24,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@brigadecore/brigadier": "radu-matei/brigadier#job-volume-config-out"
+    "@brigadecore/brigadier": "^0.6.1"
   },
   "author": "The Brigade Authors",
   "license": "MIT"
