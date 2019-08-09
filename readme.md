@@ -60,7 +60,7 @@ This script is one that can be used to build this repository.
 
 ## The Kind library
 
-[Kind][kind] (Kubernetes in Docker) is a tool for creating a local Kubernetes cluster using Docker containers as nodes, nd it is a very fast and convenient way of setting up a Kubernetes cluster for testing.
+[Kind][kind] (Kubernetes in Docker) is a tool for creating a local Kubernetes cluster using Docker containers as nodes, and it is a very fast and convenient way of setting up a Kubernetes cluster for testing.
 
 But while [setting it up locally is straightforward][kind-getting-started], running a Kind cluster inside your Kubernetes cluster (for various end-to-end testing scenarios) is rather difficult. This library abstracts all that, and creating and using a cluster can be easily achieved with Brigade:
 
