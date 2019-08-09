@@ -21,7 +21,7 @@ describe("when creating a new Kind job", () => {
         let kind = new KindJob("kind");
 
         assert.isTrue(kind.privileged);
-        assert.equal(kind.tasks.length, 8);
+        assert.equal(kind.tasks.length, 9);
     });
 
     it("all volumes are properly set", () => {

@@ -12,6 +12,10 @@ export class KindJob extends Job {
         // kind needs to run as a privileged pod
         this.privileged = true;
 
+        // since the cluste creation takes some time,
+        // set the timeout to 30 minutes
+        this.timeout = 180000;
+
         // kind needs to add the following volumeMounts to function properly
         // the Brigade project must enable `allowMountHosts`
         this.volumes = [
@@ -52,23 +56,24 @@ export class KindJob extends Job {
 
         // to add your own tasks to this job, use job.tasks.push()
         this.tasks = [
+            // when the pod finishes, regardless of the exit code, delete the cluster
+            // to avoid resource leaks
+            // see https://github.com/kubernetes-sigs/kind/issues/759
+            "trap 'kind delete cluster' SIGTERM EXIT",
             "dockerd-entrypoint.sh &",
             "sleep 20",
-            "kind create cluster",
+            "kind create cluster --wait 300s",
             `export KUBECONFIG="$(kind get kubeconfig-path)"`,
-            "kubectl cluster-info",
-
             // this pod is runing inside a Kubernetes cluster
             // unset environment variables pointing to the host cluster
             // even if the service account is limited, and KUBECONFIG is properly set,
             // some operations might still point to the in-cluster configuration
             "unset $(env | grep KUBERNETES_ | xargs)",
-
-            // the time needed for the control plane to properly start is around 2 minutes
-            //
-            // TODO: use a kubectl plugin to wait for all pods of the control plane 
-            "sleep 150",
-            "kubectl get pods --all-namespaces"
+            "kubectl cluster-info",
+            "kubectl get pods --all-namespaces",
+            // even though we're using the --wait flag for kind, 
+            // some pods (the DNS pods, for example) are not ready yet.
+            "sleep 60"
         ];
     }
 }
