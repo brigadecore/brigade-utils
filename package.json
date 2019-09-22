@@ -1,6 +1,6 @@
 {
   "name": "@brigadecore/brigade-utils",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Various utility classes and functions to use in brigade.js",
   "main": "out/index.js",
   "types": "out/index.d.ts",
@@ -24,7 +24,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@brigadecore/brigadier": "^0.4.0"
+    "@brigadecore/brigadier": "^0.6.1"
   },
   "author": "The Brigade Authors",
   "license": "Apache-2.0"

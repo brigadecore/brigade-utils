@@ -4,4 +4,5 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./github"));
+__export(require("./kind"));
 //# sourceMappingURL=index.js.map
