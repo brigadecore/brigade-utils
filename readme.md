@@ -6,16 +6,15 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 
 ```json
 {
-    "dependencies": {
-        "@brigadecore/brigade-utils": "0.3.0"
-    }
+  "dependencies": {
+    "@brigadecore/brigade-utils": "0.3.0"
+  }
 }
 ```
 
 > Note that any dependency added here should point the exact version (and not use the tilde `~` and caret `^` to indicate semver compatible versions).
 
 > Use the appropriate version of this library that you can find on NPM - [`@brigadecore/brigade-utils`][npm]
-
 
 ## The GitHub library
 
@@ -51,7 +50,9 @@ events.on("check_suite:requested", runSuite);
 events.on("check_suite:rerequested", runSuite);
 
 // this enables "/brig run" comments from allowed authors to start a check run
-events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
+events.on("issue_comment:created", (e, p) =>
+  Check.handleIssueComment(e, p, runSuite)
+);
 ```
 
 This script is one that can be used to build this repository.
@@ -65,16 +66,17 @@ This script is one that can be used to build this repository.
 But while [setting it up locally is straightforward][kind-getting-started], running a Kind cluster inside your Kubernetes cluster (for various end-to-end testing scenarios) is rather difficult. This library abstracts all that, and creating and using a cluster can be easily achieved with Brigade:
 
 ```js
+const { events, Job } = require("@brigadecore/brigadier");
 const { KindJob } = require("@brigadecore/brigade-utils");
 
 function e2e(event, project) {
-    let kind = new KindJob("kind");
-    kind.tasks.push(
-        // add your end-to-end tests
-        "kubectl get pods --all-namespaces"
-    );
+  let kind = new KindJob("kind");
+  kind.tasks.push(
+    // add your end-to-end tests
+    "kubectl get pods --all-namespaces"
+  );
 
-    return kind;
+  return kind.run();
 }
 
 events.on("exec", e2e);
@@ -87,7 +89,7 @@ The `KindJob` class already configures the environment for a 1-node Kind cluster
 - starts Docker in Docker
 - creates a 1-node Kind cluster
 - exports the `KUBECONFIG` environment variable to point to the newly created cluster
-- unsets the Kubernetes environment variables that point to the host cluster 
+- unsets the Kubernetes environment variables that point to the host cluster
 - ensures the cluster deletion command is always executed as cleanup
 
 Notes:
@@ -117,16 +119,15 @@ $ yarn test
 $ yarn audit
 ```
 
-Note that this repository *does not* ignore the generated `out/` directory that contains the compiled JavaScript code. This is done because for every pull request in this repository, we automatically [add it as a local dependency to the Brigade worker (that is a dependency that is local to the repository)][local-deps], and use the GitHub library to test itself.
+Note that this repository _does not_ ignore the generated `out/` directory that contains the compiled JavaScript code. This is done because for every pull request in this repository, we automatically [add it as a local dependency to the Brigade worker (that is a dependency that is local to the repository)][local-deps], and use the GitHub library to test itself.
 
 While this is not common or idiomatic for TypeScript projects, it is the easiest way to test the libraries in this repo for each pull request, so please include the `out/` directory when submitting a pull request.
 
 ## Signed commits
 
-A DCO sign-off is required for contributions to repos in the brigadecore org.  See the documentation in
+A DCO sign-off is required for contributions to repos in the brigadecore org. See the documentation in
 [Brigade's Contributing guide](https://github.com/brigadecore/brigade/blob/master/CONTRIBUTING.md#signed-commits)
 for how this is done.
-
 
 [brigade-json]: https://docs.brigade.sh/topics/dependencies/#add-custom-dependencies-using-a-brigade-json-file
 [local-deps]: https://docs.brigade.sh/topics/dependencies/#using-local-dependencies-from-the-project-repository
