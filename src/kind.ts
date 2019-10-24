@@ -14,7 +14,7 @@ export class KindJob extends Job {
 
         // since the cluster creation takes some time,
         // set the timeout to 30 minutes
-        this.timeout = 180000;
+        this.timeout = 1800000;
 
         // kind needs to add the following volumeMounts to function properly
         // the Brigade project must enable `allowHostMounts`

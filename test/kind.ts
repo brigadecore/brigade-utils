@@ -3,6 +3,12 @@ import { assert } from "chai";
 import { KindJob, kindJobImage } from "../src/kind";
 
 describe("when creating a new Kind job", () => {
+    it("the default timeout represents 30 minutes", () => {
+        let kind = new KindJob("kind");
+
+        assert.equal((kind.timeout / (1000 * 60)), 30)
+    });
+
     it("without an image for the job, the default image is used", () => {
         let kind = new KindJob("kind");
 
@@ -17,7 +23,7 @@ describe("when creating a new Kind job", () => {
         assert.equal(kind.image, "my-custom-kind-image");
     });
 
-    it("job is privilged, with right number of pre-defined tasks", () => {
+    it("job is privileged, with right number of pre-defined tasks", () => {
         let kind = new KindJob("kind");
 
         assert.isTrue(kind.privileged);
