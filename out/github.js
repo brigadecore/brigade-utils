@@ -118,10 +118,12 @@ class Notification {
             catch (e) {
                 const logs = yield job.logs();
                 this.conclusion = Conclusion.Failure;
-                this.summary = `Task "${job.name}" failed for ${e.buildID}`;
+                this.summary = `Task "${job.name}" failed for build ${this.externalID}`;
                 this.text = "```" + logs + "```\nFailed with error: " + e.toString();
                 try {
-                    return yield this.send();
+                    // Send the notification but we still want to return the original error
+                    yield this.send();
+                    return e;
                 }
                 catch (e2) {
                     console.error("failed to send notification: " + e2.toString());
