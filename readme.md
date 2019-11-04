@@ -42,7 +42,7 @@ function build(event, project) {
 }
 
 function runSuite(e, p) {
-  var check = new Check(e, p, build());
+  var check = new Check(e, p, build(e, p));
   check.run();
 }
 
