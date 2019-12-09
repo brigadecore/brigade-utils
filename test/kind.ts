@@ -23,6 +23,18 @@ describe("when creating a new Kind job", () => {
         assert.equal(kind.image, "my-custom-kind-image");
     });
 
+    it("without a kubernetes version, the default value is used", () => {
+      let kind = new KindJob("kind", "my-custom-kind-image");
+
+      assert.equal(kind.kubernetesVersion, "v1.15.3");
+    });
+
+    it("when a kubernetes version is passed, the value is used", () => {
+      let kind = new KindJob("kind", "my-custom-kind-image", "v1.0.0");
+
+      assert.equal(kind.kubernetesVersion, "v1.0.0");
+    });
+
     it("job is privileged, with right number of pre-defined tasks", () => {
         let kind = new KindJob("kind");
 
