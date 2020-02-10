@@ -1,13 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const brigadier_1 = require("@brigadecore/brigadier");
-exports.kindJobImage = "radumatei/golang-kind:1.11-0.4";
+exports.kindJobImage = "brigadecore/golang-kind:1.13.7-v0.7.0";
 class KindJob extends brigadier_1.Job {
-    constructor(name, image) {
+    constructor(name, image, kubernetesVersion) {
         if (image == undefined) {
             image = exports.kindJobImage;
         }
         super(name, image);
+        if (kubernetesVersion == undefined) {
+            // set a default for the kind cluster version
+            // must be supported by the kind version in the default kindJobImage used
+            this.kubernetesVersion = "v1.17.2";
+        }
+        else {
+            this.kubernetesVersion = kubernetesVersion;
+        }
         // kind needs to run as a privileged pod
         this.privileged = true;
         // since the cluster creation takes some time,
@@ -58,7 +66,7 @@ class KindJob extends brigadier_1.Job {
             "trap 'kind delete cluster' EXIT",
             "dockerd-entrypoint.sh &",
             "sleep 20",
-            "kind create cluster --wait 300s",
+            `kind create cluster --image kindest/node:${this.kubernetesVersion} --wait 300s`,
             `export KUBECONFIG="$(kind get kubeconfig-path)"`,
             // this pod is running inside a Kubernetes cluster
             // unset environment variables pointing to the host cluster

@@ -1,6 +1,6 @@
 import { Job } from "@brigadecore/brigadier";
 
-export const kindJobImage = "radumatei/golang-kind:1.11-0.4";
+export const kindJobImage = "brigadecore/golang-kind:1.13.7-v0.7.0";
 
 export class KindJob extends Job {
     kubernetesVersion: String;
@@ -14,7 +14,7 @@ export class KindJob extends Job {
         if (kubernetesVersion == undefined) {
           // set a default for the kind cluster version
           // must be supported by the kind version in the default kindJobImage used
-          this.kubernetesVersion = "v1.15.3";
+          this.kubernetesVersion = "v1.17.2";
         } else {
           this.kubernetesVersion = kubernetesVersion;
         }
