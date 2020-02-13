@@ -1,7 +1,8 @@
 import "mocha";
 import { assert } from "chai";
 import * as mock from "./mock";
-import { Notification, Check, notificationJobImage } from "../src/github";
+import { Notification, Check, notificationJobImage, GitHubRelease } from "../src/github";
+import { Project } from "@brigadecore/brigadier/out/events";
 
 describe("when creating a new GitHub notification", () => {
     it("all properties are properly instantiated", () => {
@@ -32,4 +33,73 @@ describe("when creating a new GitHub check", () => {
         assert.equal(check.event, event);
         assert.equal(check.notification.name, "mock-name");
     });
+});
+
+describe("when creating a new GitHubRelease", () => {
+  var project:Project;
+  var tag:string;
+
+  beforeEach(function() {
+    project = mock.mockProject();
+    project.secrets = {
+      ghToken: "github-token"
+    };
+    tag = "tag";
+  });
+
+  it("an error is returned if secrets.ghToken does not exist", () => {
+    project.secrets.ghToken = "";
+    let newGitHubRelease = function(){new GitHubRelease(project, tag)};
+
+    assert.throws(newGitHubRelease, "project.secrets.ghToken undefined");
+  });
+
+  it("an error is returned if project.repo does not exist", () => {
+    project.repo = undefined;
+    let newGitHubRelease = function(){new GitHubRelease(project, tag)};
+
+    assert.throws(newGitHubRelease, "project.repo.name undefined");
+  });
+
+  it("the default configuration is as expected", () => {
+    let gh = new GitHubRelease(project, tag);
+
+    assert.equal(gh.name, "brigadecore-empty-testbed-release");
+    assert.equal(gh.image, "brigadecore/gh-release:edge")
+    assert.equal(gh.env.GITHUB_TOKEN, project.secrets.ghToken);
+
+    let expectedTasks = [
+      `cd /src`,
+      `last_tag=$(git describe --tags tag^ --abbrev=0 --always)`,
+      `ghr \
+        -u brigadecore \
+        -r empty-testbed \
+        -n "empty-testbed tag" \
+        -b "$(git log --no-merges --pretty=format:'- %s %H (%aN)' HEAD ^$last_tag)" \
+        tag 
+      `
+    ];
+    assert.deepEqual(gh.tasks, expectedTasks);
+  });
+
+  it("configuration overrides are honored", () => {
+    let gh = new GitHubRelease(project, tag, "bindir", "workdir");
+
+    assert.equal(gh.name, "brigadecore-empty-testbed-release");
+    assert.equal(gh.image, "brigadecore/gh-release:edge");
+    assert.equal(gh.env.GITHUB_TOKEN, project.secrets.ghToken);
+
+    let expectedTasks = [
+      `cd workdir`,
+      `last_tag=$(git describe --tags tag^ --abbrev=0 --always)`,
+      `ghr \
+        -u brigadecore \
+        -r empty-testbed \
+        -n "empty-testbed tag" \
+        -b "$(git log --no-merges --pretty=format:'- %s %H (%aN)' HEAD ^$last_tag)" \
+        tag bindir
+      `
+    ];
+    assert.deepEqual(gh.tasks, expectedTasks);
+  });
 });

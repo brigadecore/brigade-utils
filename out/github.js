@@ -148,4 +148,38 @@ var Conclusion;
     // this sets the status of the check run to "in_progress"
     Conclusion["InProgress"] = "";
 })(Conclusion = exports.Conclusion || (exports.Conclusion = {}));
+class GitHubRelease extends brigadier_1.Job {
+    /**
+    * Creates a GitHub release using the provided arguments.
+    * The release body is pre-configured to be a listing of commits since the last tag.
+    *
+    * @param project - the Brigade project
+    * @param tag - release tag
+    * @param binDir - optional path to the directory holding release assets (default is empty)
+    * @param workDir - optional path to the working directory (default is "/src")
+    */
+    constructor(project, tag, binDir = "", workDir = "/src") {
+        if (!project.secrets || !project.secrets.ghToken) {
+            throw new Error("project.secrets.ghToken undefined");
+        }
+        if (!project.repo) {
+            throw new Error("project.repo.name undefined");
+        }
+        let parts = project.repo.name.split("/", 2);
+        let org = parts[0];
+        let repo = parts[1];
+        super(`${org}-${repo}-release`, "brigadecore/gh-release:edge");
+        this.env = {
+            "GITHUB_TOKEN": project.secrets.ghToken,
+        };
+        this.tasks.push(`cd ${workDir}`, `last_tag=$(git describe --tags ${tag}^ --abbrev=0 --always)`, `ghr \
+        -u ${org} \
+        -r ${repo} \
+        -n "${repo} ${tag}" \
+        -b "$(git log --no-merges --pretty=format:'- %s %H (%aN)' HEAD ^$last_tag)" \
+        ${tag} ${binDir}
+      `);
+    }
+}
+exports.GitHubRelease = GitHubRelease;
 //# sourceMappingURL=github.js.map
