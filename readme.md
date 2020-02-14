@@ -18,6 +18,8 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 
 ## The GitHub library
 
+### Check
+
 Brigade comes with a [GitHub application][gh-app] that can be used to queue builds and show logs directly through the [GitHub Checks API][checks-api]. After following the instructions to set it up, adding a `brigade.js` script that uses this API can be done using the `Check` object from this library:
 
 ```javascript
@@ -58,6 +60,70 @@ events.on("issue_comment:created", (e, p) =>
 This script is one that can be used to build this repository.
 
 > Note: `Check.handleIssueComment` currently only handles `/brig run` comments - to add your own, see implementation for this method.
+
+### Release
+
+For streamlined creation of a GitHub release, one can utilize the `GitHubRelease` job.  It will create
+a release associated with the provided tag, populating the release body with a listing of commits since
+the previous tag.  Here is an example of how it can be used:
+
+```js
+const { events, Job, Group } = require("@brigadecore/brigadier");
+const { GitHubRelease } = require("@brigadecore/brigade-utils");
+
+const releaseTagRegex = /^refs\/tags\/(v[0-9]+(?:\.[0-9]+)*(?:\-.+)?)$/;
+
+// Create a shared storage object that can be shared between
+// the buildBrig job and the githubRelease job
+let releaseStorage = {
+  enabled: true,
+  path: "/release-assets",
+};
+
+// Build any artifacts that should be uploaded with the release
+function buildBrig(tag) {
+  var job = new Job("build-brig", "quay.io/deis/lightweight-docker-go:v0.7.0");
+  // Enable shared storage for this job
+  job.storage = releaseStorage;
+
+  let gopath = "/go";
+  let localPath = gopath + `/src/github.com/brigadecore/brigade`;
+
+  job.shell = "/bin/bash";
+  job.mountPath = localPath;
+  job.tasks = [
+    `cd ${localPath}`,
+    `SKIP_DOCKER=true VERSION=${tag} make build-brig`,
+    // copy the release assets into the shared storage path
+    `cp -r bin/* ${releaseStorage.path}`
+  ];
+  return job;
+}
+
+// Create a GitHubRelease job
+function githubRelease(p, tag) {
+  // Provide the GitHubRelease job with the project, the tag
+  // and the shared storage path
+  var job = new GitHubRelease(p, tag, releaseStorage.path);
+  // Enable shared storage for this job
+  job.storage = releaseStorage;
+  return job;
+}
+
+// On a push event from GitHub, if the tag matches our regex,
+// build the release arifacts first and then run the release
+events.on("push", (e, p) => {
+  let matchStr = e.revision.ref.match(releaseTagRegex);
+  if (matchStr) {
+    // This is an official release with a semantically versioned tag
+    let matchTokens = Array.from(matchStr);
+    let version = matchTokens[1];
+    return Group.runEach([
+      buildBrig(version),
+      githubRelease(p, version)
+    ]);
+});
+```
 
 ## The Kind library
 

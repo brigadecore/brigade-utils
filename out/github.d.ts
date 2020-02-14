@@ -55,3 +55,15 @@ export declare enum Conclusion {
     TimedOut = "timed_out",
     InProgress = ""
 }
+export declare class GitHubRelease extends Job {
+    /**
+    * Creates a GitHub release using the provided arguments.
+    * The release body is pre-configured to be a listing of commits since the last tag.
+    *
+    * @param project - the Brigade project
+    * @param tag - release tag
+    * @param binDir - optional path to the directory holding release assets (default is empty)
+    * @param workDir - optional path to the working directory (default is "/src")
+    */
+    constructor(project: Project, tag: string, binDir?: string, workDir?: string);
+}
