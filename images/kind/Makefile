@@ -2,17 +2,9 @@
 # which is the default image for the KindJob class
 
 BASE_IMAGE_NAME = golang-kind
-DOCKER_ORG ?= brigadecore
-GO_VERSION ?= 1.13.7
-KIND_VERSION ?= v0.7.0
-
-ifdef DOCKER_REGISTRY
-	DOCKER_REGISTRY := $(DOCKER_REGISTRY)/
-endif
-
-DOCKER_IMAGE_PREFIX := $(DOCKER_REGISTRY)$(DOCKER_ORG)/
-
-VERSION ?= $(GO_VERSION)-$(KIND_VERSION)
+GO_VERSION     ?= 1.13.7
+KIND_VERSION   ?= v0.7.0
+VERSION        ?= $(GO_VERSION)-$(KIND_VERSION)
 
 .PHONY: build
 build:
