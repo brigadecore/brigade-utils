@@ -1,6 +1,7 @@
 import { BrigadeEvent, Project, } from "@brigadecore/brigadier/out/events";
 import { Result } from "@brigadecore/brigadier/out/job";
 import { Job } from "@brigadecore/brigadier";
+import { GITHUB_CHECK_TEXT_MAX_CHARS } from "../src/github"
 
 export function mockProject(): Project {
     return {
@@ -44,6 +45,7 @@ export function mockEvent() {
 export class MockJob extends Job {
     public fail: boolean = false;
     public delay: number = 1; // Just enough to cause the event loop to sleep it.
+    public exceedLogLimit: boolean = false;
     public run(): Promise<Result> {
         let fail = this.fail;
         let delay = this.delay;
@@ -55,6 +57,16 @@ export class MockJob extends Job {
                 }, delay);
                 return;
             }
+            if (this.exceedLogLimit) {
+              setTimeout(() => {
+                let text = "";
+                for (let i = 0; i < (GITHUB_CHECK_TEXT_MAX_CHARS + 42); i++) {
+                  text += "i";
+                }
+                resolve(text);
+              }, delay);
+              return;
+          }
             setTimeout(() => { resolve(new MockResult(this.name)) }, delay);
         });
     }

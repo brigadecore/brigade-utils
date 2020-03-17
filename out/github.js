@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const brigadier_1 = require("@brigadecore/brigadier");
+exports.GITHUB_CHECK_TEXT_MAX_CHARS = 65535;
 class Check {
     constructor(event, project, job, detailsURL, notification) {
         this.event = event;
@@ -48,7 +49,7 @@ class Check {
 }
 exports.Check = Check;
 // Whenever https://github.com/brigadecore/brigade-github-app releases a new version for the check run image, this should be updated
-exports.notificationJobImage = "brigadecore/brigade-github-check-run:v0.1.0";
+exports.notificationJobImage = "quay.io/vdice/brigade-github-check-run:9d2c9d4-dirty";
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
  */
@@ -86,6 +87,14 @@ class Notification {
         this.count++;
         var j = new brigadier_1.Job(`${this.name}-${this.count}`, this.notificationJobImage);
         j.imageForcePull = true;
+        // GitHub limits this field to 65535 characters, so we
+        // trim the length (from the beginning) prior to sending,
+        // inserting a placeholder for the text omitted after truncation.
+        if (this.text.length > exports.GITHUB_CHECK_TEXT_MAX_CHARS) {
+            let textOmittedMsg = "(Previous text omitted)\n";
+            this.text = this.text.slice(this.text.length - (exports.GITHUB_CHECK_TEXT_MAX_CHARS - textOmittedMsg.length));
+            this.text = textOmittedMsg + this.text;
+        }
         j.env = {
             CHECK_CONCLUSION: this.conclusion,
             CHECK_NAME: this.name,
@@ -162,7 +171,7 @@ class GitHubRelease extends brigadier_1.Job {
         if (!project.secrets || !project.secrets.ghToken) {
             throw new Error("project.secrets.ghToken undefined");
         }
-        if (!project.repo) {
+        if (!project.repo || !project.repo.name) {
             throw new Error("project.repo.name undefined");
         }
         let parts = project.repo.name.split("/", 2);

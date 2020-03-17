@@ -2,6 +2,8 @@ import { BrigadeEvent, EventHandler, Project } from "@brigadecore/brigadier/out/
 import { Result } from "@brigadecore/brigadier/out/job";
 import { Job } from "@brigadecore/brigadier";
 
+export const GITHUB_CHECK_TEXT_MAX_CHARS = 65535;
+
 export class Check {
     event: BrigadeEvent;
     project: Project;
@@ -101,6 +103,15 @@ export class Notification {
         this.count++;
         var j = new Job(`${this.name}-${this.count}`, this.notificationJobImage);
         j.imageForcePull = true;
+        // GitHub limits this field to 65535 characters, so we
+        // trim the length (from the beginning) prior to sending,
+        // inserting a placeholder for the text omitted after truncation.
+        if (this.text.length > GITHUB_CHECK_TEXT_MAX_CHARS) {
+          let textOmittedMsg = "(Previous text omitted)\n"
+          this.text = this.text.slice(
+            this.text.length - (GITHUB_CHECK_TEXT_MAX_CHARS - textOmittedMsg.length));
+          this.text = textOmittedMsg + this.text;
+        }
         j.env = {
             CHECK_CONCLUSION: this.conclusion,
             CHECK_NAME: this.name,

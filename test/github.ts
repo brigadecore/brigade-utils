@@ -1,7 +1,7 @@
 import "mocha";
 import { assert } from "chai";
 import * as mock from "./mock";
-import { Notification, Check, notificationJobImage, GitHubRelease } from "../src/github";
+import { Notification, Check, notificationJobImage, GitHubRelease, GITHUB_CHECK_TEXT_MAX_CHARS } from "../src/github";
 import { Project } from "@brigadecore/brigadier/out/events";
 
 describe("when creating a new GitHub notification", () => {
@@ -33,6 +33,20 @@ describe("when creating a new GitHub check", () => {
         assert.equal(check.event, event);
         assert.equal(check.notification.name, "mock-name");
     });
+
+    it("check run text is trimmed appropriately", () => {
+      let project = mock.mockProject();
+      let event = mock.mockEvent();
+      let job = new mock.MockJob("mock-name");
+      job.exceedLogLimit = true;
+      let check = new Check(event, project, job);
+
+      check.run()
+        .then(() => {
+          assert.equal(check.notification.text.length, GITHUB_CHECK_TEXT_MAX_CHARS);
+          assert.isTrue(check.notification.text.slice(0, 25).includes("(Previous text omitted)\n"));
+        });
+  });
 });
 
 describe("when creating a new GitHubRelease", () => {
