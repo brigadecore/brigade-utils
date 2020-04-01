@@ -1,6 +1,7 @@
 import { BrigadeEvent, EventHandler, Project } from "@brigadecore/brigadier/out/events";
 import { Result } from "@brigadecore/brigadier/out/job";
 import { Job } from "@brigadecore/brigadier";
+export declare const GITHUB_CHECK_TEXT_MAX_CHARS = 65535;
 export declare class Check {
     event: BrigadeEvent;
     project: Project;
