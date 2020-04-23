@@ -70,7 +70,7 @@ events.on("push", (e, p) => {
     let matchTokens = Array.from(matchStr);
     let version = matchTokens[1];
     return Group.runEach([
-      buildAndPublishKindImage(p),
+      buildAndPublishImages(p),
       // publish runs the build tasks first, so no need to call build() here
       publish(p, version)
     ]);
@@ -79,7 +79,7 @@ events.on("push", (e, p) => {
   } else { // push to master
     return Group.runAll([
       build(),
-      buildAndPublishKindImage(p)
+      buildAndPublishImages(p)
     ]);
   }
 });
@@ -90,6 +90,3 @@ events.on("check_suite:rerequested", runSuite);
 events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
 events.on("issue_comment:edited", (e, p) => Check.handleIssueComment(e, p, runSuite));
 
-events.on("push", (e, p) => {
-  return buildAndPublishImages(p).run();
-});
