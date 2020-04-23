@@ -19,18 +19,18 @@ function build() {
   return build;
 }
 
-function buildAndPublishKindImage(project) {
+function buildAndPublishImages(project) {
   let dockerRegistry = project.secrets.dockerhubRegistry || "docker.io";
   let dockerOrg = project.secrets.dockerhubOrg || "brigadecore";
-  var job = new Job("build-and-publish-kind-image", "docker:stable-dind");
+  var job = new Job("build-and-publish-images", "docker:stable-dind");
   job.privileged = true;
   job.tasks = [
     "apk add --update --no-cache make git",
     "dockerd-entrypoint.sh &",
     "sleep 20",
-    "cd /src/kind-image",
+    "cd /src/images",
     `docker login ${dockerRegistry} -u ${project.secrets.dockerhubUsername} -p ${project.secrets.dockerhubPassword}`,
-    `DOCKER_REGISTRY=${dockerRegistry} DOCKER_ORG=${dockerOrg} make build push`,
+    `DOCKER_REGISTRY=${dockerRegistry} DOCKER_ORG=${dockerOrg} make build-image push-image`,
     `docker logout ${dockerRegistry}`
   ];
   return job;
@@ -89,3 +89,7 @@ events.on("check_suite:rerequested", runSuite);
 
 events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
 events.on("issue_comment:edited", (e, p) => Check.handleIssueComment(e, p, runSuite));
+
+events.on("push", (e, p) => {
+  return buildAndPublishImages(p).run();
+});
