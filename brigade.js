@@ -1,5 +1,6 @@
 const { events, Job, Group } = require("@brigadecore/brigadier");
 const { Check } = require("./out/github");
+const { NPMReleaseJob } = require("./out/npm");
 
 const projectName = "brigade-utils";
 const jsImg = "node:12.3.1-stretch"
@@ -42,24 +43,11 @@ function runSuite(e, p) {
 }
 
 function publish(project, version) {
-  var publish = new Job(`${projectName}-publish`, jsImg);
+  var publish = new NPMReleaseJob(`${projectName}-publish`);
   publish.env = {
-      "NPM_TOKEN": project.secrets.npmToken
+    "NPM_TOKEN": project.secrets.npmToken,
+    "VERSION": version
   };
-  // The steps to publish include the steps to build, and then some, so we'll
-  // use the build job steps as a starting point.
-  publish.tasks = build().tasks;
-  // If we leave .npmrc at the root of the project with the NPM_TOKEN env var
-  // unset, all yarn commands will fail. Since this env var is populated with
-  // the correct secret ONLY for this one job, we create .npmrc right here,
-  // just in time.
-  publish.tasks.push("echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc");
-  publish.tasks.push("apt-get update");
-  publish.tasks.push("apt-get install -y jq");
-  publish.tasks.push("cat package.json | jq '.version |= \"" + version + "\"' > package.json.tmp");
-  publish.tasks.push("rm package.json")
-  publish.tasks.push("mv package.json.tmp package.json")
-  publish.tasks.push("npm publish");
   return publish;
 }
 
@@ -70,8 +58,8 @@ events.on("push", (e, p) => {
     let matchTokens = Array.from(matchStr);
     let version = matchTokens[1];
     return Group.runEach([
+      build(),
       buildAndPublishImages(p),
-      // publish runs the build tasks first, so no need to call build() here
       publish(p, version)
     ]);
   } else if (e.revision.ref.startsWith('refs/tags')) {
