@@ -49,7 +49,7 @@ class Check {
 }
 exports.Check = Check;
 // Whenever https://github.com/brigadecore/brigade-github-app releases a new version for the check run image, this should be updated
-exports.notificationJobImage = "quay.io/vdice/brigade-github-check-run:9d2c9d4-dirty";
+exports.notificationJobImage = "brigadecore/brigade-github-check-run:v0.1.0";
 /**
  * Notification is an object sent to the GitHub Checks API to indicate the start / fisnish of a check run.
  */
