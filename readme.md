@@ -16,6 +16,15 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 
 > Use the appropriate version of this library that you can find on NPM - [`@brigadecore/brigade-utils`][npm]
 
+# Quick Links
+
+* [The GitHub Library](#the-github-library)
+* [The Kind Library](#the-kind-library)
+* [The NPM Library](#the-npm-library)
+* [Contributing](#contributing)
+
+___
+
 ## The GitHub library
 
 ### Check
@@ -166,6 +175,36 @@ Notes:
 - the default image used contains `docker`, `go`, `kind`, `git`, `wget`, `apk` - you can supply your own, or you can use `apk`, or download other tools you might need.
 - if overriding the default configuration, ensure you are cleaning up clusters created to avoid resource leaks. See [how tasks are configured](./src/kind.ts).
 - the default timeout for Brigade jobs is 15 minutes - by default, the `KindJob` sets the timeout to 30 minutes, and you can configure it by setting the `job.timeout` property - and keep in mind the value is in milliseconds.
+
+## The NPM Library
+
+### Release
+
+The `NPMReleaseJob` is a class that can be used for publishing releases to [npm](https://www.npmjs.com/).  It is a simple extension of the stock `Job` class and the resulting pod uses and image based on an official [node Docker image](https://hub.docker.com/_/node).  This Dockerfile can be seen [here](./images/npm-release/Dockerfile).
+
+The main tasks pre-baked into this job are to:
+
+* Inspect the job environment for two crucial variables, namely:
+  * `NPM_TOKEN`: the authorization token with ability to publish to the package to npm
+  * `VERSION`: the version of the package intending to be published
+  * (If either are missing, the job will exit non-zero with the appropriate error message)
+* Inject `VERSION` into the `package.json` assumed to be in the working directory
+* Invoke `npm publish`
+
+Here's an example use of this job:
+
+```javascript
+function publish(project, version) {
+  var publish = new NPMReleaseJob("npm-publish");
+  publish.env = {
+    "NPM_TOKEN": project.secrets.npmToken,
+    "VERSION": version
+  };
+  return publish;
+}
+```
+
+When `publish.run()` is invoked, this job will execute and the end result should be a freshly-published npm package!
 
 # Contributing
 
