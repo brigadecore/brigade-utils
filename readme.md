@@ -7,7 +7,7 @@ To add this package, [use the `brigade.json` file][brigade-json] in the reposito
 ```json
 {
   "dependencies": {
-    "@brigadecore/brigade-utils": "0.4.1"
+    "@brigadecore/brigade-utils": "0.5.0"
   }
 }
 ```
