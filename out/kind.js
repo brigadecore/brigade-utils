@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const brigadier_1 = require("@brigadecore/brigadier");
-exports.kindJobImage = "brigadecore/golang-kind:1.13.7-v0.7.0";
+exports.kindJobImage = "brigadecore/golang-kind:1.15.8-v0.10.0";
 class KindJob extends brigadier_1.Job {
     constructor(name, image, kubernetesVersion) {
         if (image == undefined) {
@@ -11,7 +11,7 @@ class KindJob extends brigadier_1.Job {
         if (kubernetesVersion == undefined) {
             // set a default for the kind cluster version
             // must be supported by the kind version in the default kindJobImage used
-            this.kubernetesVersion = "v1.17.2";
+            this.kubernetesVersion = "v1.20.2";
         }
         else {
             this.kubernetesVersion = kubernetesVersion;
@@ -67,7 +67,9 @@ class KindJob extends brigadier_1.Job {
             "dockerd-entrypoint.sh &",
             "sleep 20",
             `kind create cluster --image kindest/node:${this.kubernetesVersion} --wait 300s`,
-            `export KUBECONFIG="$(kind get kubeconfig-path)"`,
+            `kind get kubeconfig > kind-kubeconfig`,
+            `chmod 400 kind-kubeconfig`,
+            `export KUBECONFIG=$(pwd)/kind-kubeconfig`,
             // this pod is running inside a Kubernetes cluster
             // unset environment variables pointing to the host cluster
             // even if the service account is limited, and KUBECONFIG is properly set,

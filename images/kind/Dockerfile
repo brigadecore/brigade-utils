@@ -1,8 +1,8 @@
 ARG GO_VERSION
 
-FROM lachlanevenson/k8s-kubectl:v1.17.2 as kubectl
+FROM lachlanevenson/k8s-kubectl:v1.20.4 as kubectl
 
-FROM golang:${GO_VERSION}-alpine3.11 as golang
+FROM golang:${GO_VERSION}-alpine3.13 as golang
 
 FROM docker:stable-dind
 
