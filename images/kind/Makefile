@@ -2,8 +2,8 @@
 # which is the default image for the KindJob class
 
 BASE_IMAGE_NAME = golang-kind
-GO_VERSION     ?= 1.13.7
-KIND_VERSION   ?= v0.7.0
+GO_VERSION     ?= 1.15.8
+KIND_VERSION   ?= v0.10.0
 VERSION        ?= $(GO_VERSION)-$(KIND_VERSION)
 
 .PHONY: build
