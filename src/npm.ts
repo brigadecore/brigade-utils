@@ -19,8 +19,9 @@ export class NPMReleaseJob extends Job {
 
     this.tasks = [
       checkEnv,
+      "cd ${WORKSPACE}",
       "echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc",
-      "cat package.json | jq '.version |= \"${VERSION}\"' > package.json.tmp",
+      "cat package.json | jq '.version |= env.VERSION' > package.json.tmp",
       "rm package.json",
       "mv package.json.tmp package.json",
       "npm publish"

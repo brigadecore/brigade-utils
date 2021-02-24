@@ -46,7 +46,8 @@ function publish(project, version) {
   var publish = new NPMReleaseJob(`${projectName}-publish`);
   publish.env = {
     "NPM_TOKEN": project.secrets.npmToken,
-    "VERSION": version
+    "VERSION": version,
+    "WORKSPACE": "/src"
   };
   return publish;
 }
@@ -77,4 +78,3 @@ events.on("check_suite:rerequested", runSuite);
 
 events.on("issue_comment:created", (e, p) => Check.handleIssueComment(e, p, runSuite));
 events.on("issue_comment:edited", (e, p) => Check.handleIssueComment(e, p, runSuite));
-
