@@ -1,3 +1,7 @@
+> ⚠️&nbsp;&nbsp;This repo contains the source for a component of the Brigade
+> v1.x ecosystem. Brigade v1.x reached end-of-life on June 1, 2022 and as a
+> result, this component is no longer maintained.
+
 # Brigade Utils
 
 This repository aims to package frequently used Brigade jobs, allowing us to avoid replicating the same functionality. It is imported as an NPM package in the Brigade worker, and can be used directly in `brigade.js` scripts.
